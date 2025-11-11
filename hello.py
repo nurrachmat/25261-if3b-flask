@@ -6,7 +6,8 @@ app = Flask(__name__)
 # Menentukan route untuk halaman utama
 @app.route('/')
 def hello_world():
-    return 'Hello, World!'
+    title = "Home Page"
+    return render_template('index.html', title=title)
 
 @app.route('/about')
 def about():
@@ -17,6 +18,11 @@ def about():
 def contact():
     title = "Contact Page"
     return render_template('contact.html', title=title)
+
+@app.route('/pmb')
+def pmb():
+    title = "Penerimaan Mahasiswa Baru"
+    return render_template('pmb.html', title=title)
 
 # Menjalankan aplikasi
 if __name__ == '__main__':
