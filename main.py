@@ -14,13 +14,9 @@ CORS(app)
 
 # Load model yang sudah dilatih
 try:
-    model = load_model("model_guntingbatukertas.keras", compile=False)  # Memuat model .keras tanpa kompilasi
-    print("Model loaded successfully!")
+    model = load_model("model_guntingbatukertas.keras")  # Memuat model .keras
 except Exception as e:
     # Jika terjadi kesalahan saat memuat model, berikan error
-    print(f"Error loading model: {str(e)}")
-    print("Model mungkin dibuat dengan versi Keras/TensorFlow yang berbeda.")
-    print("Silakan buat ulang model atau periksa kompatibilitas versi.")
     raise ValueError(f"Error loading model: {str(e)}")
 
 # Label yang digunakan sesuai dengan model yang dilatih
