@@ -1,12 +1,14 @@
 from flask import Flask, request, jsonify  # Untuk membuat API
 from flask_cors import CORS  # Untuk mengaktifkan CORS
 import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras.models import load_model  # Untuk memuat model yang telah disimpan
-from tensorflow.keras.preprocessing.image import img_to_array  # Untuk konversi gambar ke array
-from PIL import Image  # Untuk memproses gambar
-import numpy as np  # Untuk manipulasi array
-from io import BytesIO  # Untuk membaca file gambar sebagai stream
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.image import img_to_array
+from tensorflow.keras.applications import MobileNetV2
+from tensorflow.keras import layers, Model
+from PIL import Image
+import numpy as np
+from io import BytesIO
+import os
 
 # Inisialisasi aplikasi Flask
 app = Flask(__name__)
@@ -16,12 +18,28 @@ CORS(app)
 
 # Load model yang sudah dilatih
 try:
-    model = load_model("model_guntingbatukertas.keras", compile=False, safe_mode=False)  # Memuat model .keras
+    # Coba load model yang ada
+    model = load_model("model_gbk_new.keras", compile=False, safe_mode=False)
     print("✓ Model loaded successfully!")
 except Exception as e:
-    # Jika terjadi kesalahan saat memuat model, berikan error
-    print(f"✗ Error loading model: {str(e)}")
-    raise ValueError(f"Error loading model: {str(e)}")
+    # Jika gagal, buat model baru dengan arsitektur yang sama
+    print(f"✗ Error loading saved model: {str(e)}")
+    print("🔄 Creating new model with MobileNetV2 architecture...")
+    
+    # Buat model baru dengan arsitektur yang benar
+    base_model = MobileNetV2(include_top=False, input_shape=(160, 160, 3), weights='imagenet')
+    base_model.trainable = False
+    
+    inputs = tf.keras.Input(shape=(160, 160, 3))
+    x = base_model(inputs, training=False)
+    x = layers.GlobalAveragePooling2D()(x)
+    x = layers.Dense(256, activation='relu')(x)
+    x = layers.Dropout(0.5)(x)
+    outputs = layers.Dense(3, activation='softmax')(x)
+    
+    model = Model(inputs, outputs)
+    print("⚠ WARNING: Using untrained model! Please train and save a new model.")
+    print("⚠ Predictions may not be accurate.")
 
 # Label yang digunakan sesuai dengan model yang dilatih
 LABELS = ['paper', 'rock', 'scissors']
