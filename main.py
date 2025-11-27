@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify  # Untuk membuat API
 from flask_cors import CORS  # Untuk mengaktifkan CORS
-from keras.models import load_model  # Untuk memuat model yang telah disimpan
-from keras.utils import img_to_array  # Untuk konversi gambar ke array
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras.models import load_model  # Untuk memuat model yang telah disimpan
+from tensorflow.keras.preprocessing.image import img_to_array  # Untuk konversi gambar ke array
 from PIL import Image  # Untuk memproses gambar
 import numpy as np  # Untuk manipulasi array
 from io import BytesIO  # Untuk membaca file gambar sebagai stream
@@ -14,9 +16,11 @@ CORS(app)
 
 # Load model yang sudah dilatih
 try:
-    model = load_model("model_guntingbatukertas.keras")  # Memuat model .keras
+    model = load_model("model_guntingbatukertas.keras", compile=False, safe_mode=False)  # Memuat model .keras
+    print("✓ Model loaded successfully!")
 except Exception as e:
     # Jika terjadi kesalahan saat memuat model, berikan error
+    print(f"✗ Error loading model: {str(e)}")
     raise ValueError(f"Error loading model: {str(e)}")
 
 # Label yang digunakan sesuai dengan model yang dilatih
